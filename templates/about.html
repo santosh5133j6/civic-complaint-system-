@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Civic Issue Reporting System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-building"></i>
+                <span>Civic Issues</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Report Issue</a></li>
+                <li><a href="/about" class="active">About</a></li>
+                <li><a href="/map">Map View</a></li>
+                <li><a href="/public-dashboard">View Complaints</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="padding: 4rem 0;">
+        <div class="about-content">
+            <div class="about-header">
+                <h1>About Civic Issue Reporting</h1>
+                <p>Connecting citizens with solutions for a better community</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card">
+                    <i class="fas fa-bullseye"></i>
+                    <h3>Our Mission</h3>
+                    <p>We bridge the gap between citizens and local authorities, ensuring civic issues are reported and resolved efficiently.</p>
+                </div>
+
+                <div class="about-card">
+                    <i class="fas fa-users"></i>
+                    <h3>For Citizens</h3>
+                    <p>Report issues easily with our user-friendly platform. Track progress and see real change in your community.</p>
+                </div>
+
+                <div class="about-card">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Smart Technology</h3>
+                    <p>AI-powered prioritization ensures urgent issues get attention first. Real-time updates keep everyone informed.</p>
+                </div>
+
+                <div class="about-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Transparency</h3>
+                    <p>All complaints are handled with care and directed to appropriate authorities for prompt resolution.</p>
+                </div>
+            </div>
+
+            <div class="about-cta">
+                <h2>Ready to Make a Difference?</h2>
+                <div class="cta-buttons">
+                    <a href="/" class="btn-primary">Report an Issue</a>
+                    <a href="/map" class="btn-secondary">View on Map</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Civic Issue Reporting System</p>
+        </div>
+    </footer>
+
+    <style>
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(240, 249, 255, 0.95);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .about-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .about-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .about-header p {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .about-card {
+            background: #f0f9ff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+
+        .about-card i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .about-card h3 {
+            font-size: 1.3rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+
+        .about-card p {
+            color: var(--secondary-color);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .about-cta {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), #90EE90);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .about-cta h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #e0f2fe;
+            color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background: #bae6fd;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .about-content {
+                padding: 2rem;
+            }
+
+            .about-header h1 {
+                font-size: 2rem;
+            }
+
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</body>
+</html>

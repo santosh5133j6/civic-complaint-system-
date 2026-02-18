@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Civic Issue Reporting</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-user-shield"></i>
+                <span>Admin Dashboard</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Report Issue</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/map">Map View</a></li>
+                <li><a href="/public-dashboard">Public View</a></li>
+                <li><a href="/admin" class="active">Admin</a></li>
+                <li><a href="/admin/logout" style="color: #fca5a5;"><i class="fas fa-sign-out-alt"></i> Logout ({{ admin_user }})</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container dashboard">
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon"><i class="fas fa-list"></i></div>
+                <div class="stat-info">
+                    <h3>Total Complaints</h3>
+                    <p class="stat-number">{{ stats.total or 0 }}</p>
+                </div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <h3>Pending</h3>
+                    <p class="stat-number">{{ stats.pending or 0 }}</p>
+                </div>
+            </div>
+            <div class="stat-card progress">
+                <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                <div class="stat-info">
+                    <h3>In Progress</h3>
+                    <p class="stat-number">{{ stats.in_progress or 0 }}</p>
+                </div>
+            </div>
+            <div class="stat-card resolved">
+                <div class="stat-icon"><i class="fas fa-check"></i></div>
+                <div class="stat-info">
+                    <h3>Resolved</h3>
+                    <p class="stat-number">{{ stats.resolved or 0 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Complaints by Category</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar"></i> Priority Distribution</h3>
+                <canvas id="priorityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <h3><i class="fas fa-filter"></i> Filter Complaints</h3>
+            <div class="filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+                <select id="priorityFilter" class="filter-select">
+                    <option value="">All Priorities</option>
+                    <option value="Critical">Critical</option>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                    {% endfor %}
+                </select>
+                <button onclick="refreshData()" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Complaints Table -->
+        <div class="table-container">
+            <h3><i class="fas fa-table"></i> All Complaints</h3>
+            <table class="complaints-table" id="complaintsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Department</th>
+                        <th>Image</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr data-status="{{ complaint.status }}" data-priority="{{ complaint.priority }}" data-category="{{ complaint.category }}">
+                        <td>#{{ complaint.id }}</td>
+                        <td>{{ complaint.created_at|datetime }}</td>
+                        <td>{{ complaint.name }}</td>
+                        <td><span class="badge badge-info">{{ complaint.category }}</span></td>
+                        <td><span class="badge badge-{{ complaint.priority.lower() }}">{{ complaint.priority }}</span></td>
+                        <td><span class="badge badge-status-{{ complaint.status.lower().replace(' ', '-') }}">{{ complaint.status }}</span></td>
+                        <td>{{ complaint.department }}</td>
+                        <td>
+                            {% if complaint.image_url %}
+                            <button class="btn-icon" onclick="viewComplaintImage({{ complaint.id }}, '{{ complaint.image_url }}')" title="View image evidence" style="color: #10b981;">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            {% else %}
+                            <span style="color: #94a3b8; font-size: 0.85rem;">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn-icon" onclick="showOnMap({{ complaint.latitude }}, {{ complaint.longitude }})" title="Show on map">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <button class="btn-icon" onclick="viewComplaint({{ complaint.id }})" title="View details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="updateStatus({{ complaint.id }})" title="Update status">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-icon" onclick="deleteComplaint({{ complaint.id }})" title="Delete complaint" style="color: #ef4444;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- View Complaint Modal -->
+    <div id="viewModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> Complaint Details</h2>
+                <span class="close" onclick="closeViewModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="complaintDetails">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="updateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Update Status</h2>
+                <span class="close" onclick="closeUpdateModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="updateForm">
+                    <input type="hidden" id="updateComplaintId">
+                    <div class="form-group">
+                        <label for="updateStatus">Status</label>
+                        <select id="updateStatus" class="form-control">
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="updateNotes">Admin Notes</label>
+                        <textarea id="updateNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Civic Issue Reporting System - Admin Panel</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Statistics data
+        const statsData = {{ stats|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

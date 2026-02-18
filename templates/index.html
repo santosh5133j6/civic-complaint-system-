@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Issue Reporting System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-city"></i>
+                <span>Civic Issue Reporting</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/" class="active">Report Issue</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/map">Map View</a></li>
+                <li><a href="/public-dashboard">View Complaints</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Report Civic Issues in Your Area</h1>
+            <p>Help improve our community by reporting problems that need attention</p>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        <div class="form-container">
+            <h2><i class="fas fa-file-alt"></i> Submit a Complaint</h2>
+            
+            <form id="complaintForm" enctype="multipart/form-data">
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <h3>Personal Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="+91 XXXXX XXXXX" required pattern="[0-9]{10}" maxlength="10">
+                        <small>Enter 10-digit mobile number</small>
+                    </div>
+                </div>
+
+                <!-- Issue Details -->
+                <div class="form-section">
+                    <h3>Issue Details</h3>
+                    <div class="form-group">
+                        <label for="category">Category <span class="required">*</span></label>
+                        <select id="category" name="category" required>
+                            <option value="">Select Category</option>
+                            <option value="auto">Auto-Detect from Description</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat }}">{{ cat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description <span class="required">*</span></label>
+                        <textarea id="description" name="description" rows="5" required 
+                            placeholder="Describe the issue in detail. Include severity, urgency, and impact..."></textarea>
+                        <small>Be specific and detailed for better prioritization</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Upload Image Evidence <span class="required">*</span></label>
+                        <div class="file-upload">
+                            <input type="file" id="image" name="image" accept="image/*" capture="environment" required>
+                            <label for="image" class="file-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose Image or Take Photo</span>
+                            </label>
+                        </div>
+                        <div id="imagePreview" class="image-preview"></div>
+                        <small style="color: #dc2626;"><i class="fas fa-exclamation-circle"></i> Image evidence is mandatory for complaint submission</small>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="form-section">
+                    <h3>Location</h3>
+                    <div class="form-group">
+                        <label>Select Location <span class="required">*</span></label>
+                        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                            <button type="button" id="getCurrentLocation" class="btn btn-secondary">
+                                <i class="fas fa-location-arrow"></i> Use Current Location
+                            </button>
+                            <div style="display: flex; gap: 0.5rem; flex: 1; min-width: 250px;">
+                                <input type="text" id="pincode" placeholder="Enter PIN Code (e.g., 834001)" 
+                                       style="flex: 1; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 5px;"
+                                       pattern="[0-9]{6}" maxlength="6">
+                                <button type="button" id="searchPincode" class="btn btn-secondary">
+                                    <i class="fas fa-search"></i> Search PIN
+                                </button>
+                            </div>
+                        </div>
+                        <small style="display: block; margin-bottom: 0.5rem; color: #64748b;">
+                            <i class="fas fa-info-circle"></i> Use current location (allow browser permission when asked), enter PIN code, or click on the map
+                        </small>
+                        <div id="map" class="map-container"></div>
+                        <input type="hidden" id="latitude" name="latitude" required>
+                        <input type="hidden" id="longitude" name="longitude" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address/Landmark <span class="required">*</span></label>
+                        <input type="text" id="address" name="address" placeholder="Auto-filled or enter manually" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Complaint
+                    </button>
+                    <button type="reset" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <i class="fas fa-robot"></i>
+                <h3>AI-Powered</h3>
+                <p>Automatic prioritization and categorization using machine learning</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-clock"></i>
+                <h3>Real-Time Tracking</h3>
+                <p>Track your complaint status in real-time</p>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure & Private</h3>
+                <p>Your data is encrypted and securely stored</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-check-circle"></i> Success!</h2>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="btn btn-primary">Close</button>
+                <button onclick="location.reload()" class="btn btn-secondary">Submit Another</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Civic Issue Reporting and Resolution System</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

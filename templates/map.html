@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map View - Civic Issues</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Complaint Map View</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Report Issue</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/map" class="active">Map View</a></li>
+                <li><a href="/public-dashboard">View Complaints</a></li>
+                <li><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="map-page">
+        <!-- Legend -->
+        <div class="map-legend">
+            <h3><i class="fas fa-info-circle"></i> Legend</h3>
+            <div class="legend-item">
+                <span class="marker-dot critical"></span>
+                <span>Critical Priority</span>
+            </div>
+            <div class="legend-item">
+                <span class="marker-dot high"></span>
+                <span>High Priority</span>
+            </div>
+            <div class="legend-item">
+                <span class="marker-dot medium"></span>
+                <span>Medium Priority</span>
+            </div>
+            <div class="legend-item">
+                <span class="marker-dot low"></span>
+                <span>Low Priority</span>
+            </div>
+            <hr>
+            <div class="legend-stats">
+                <p><strong>Total Complaints:</strong> <span id="totalCount">{{ complaints|length }}</span></p>
+                <p><strong>Pending:</strong> <span id="pendingCount">0</span></p>
+                <p><strong>In Progress:</strong> <span id="progressCount">0</span></p>
+                <p><strong>Resolved:</strong> <span id="resolvedCount">0</span></p>
+            </div>
+        </div>
+
+        <!-- Main Map -->
+        <div id="mainMap" class="full-map"></div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Civic Issue Reporting System</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script>
+        const complaintsData = {{ complaints|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+</body>
+</html>
