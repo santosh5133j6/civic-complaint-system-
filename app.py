@@ -25,6 +25,10 @@ init_supabase()
 prioritizer = ComplaintPrioritizer()
 duplicate_detector = DuplicateDetector()
 
+# Create necessary directories for production (Render, etc.)
+os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(Config.MODEL_PATH, exist_ok=True)
+
 
 @app.route('/')
 def index():
